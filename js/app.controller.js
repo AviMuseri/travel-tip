@@ -4,6 +4,8 @@ import { mapService } from './services/map.service.js'
 
 window.onload = onInit
 
+var gUserPos = null
+
 // To make things easier in this project structure
 // functions that are called from DOM are defined on a global app object
 window.app = {
@@ -39,6 +41,7 @@ function renderLocs(locs) {
     var strHTML = locs
         .map(loc => {
             const className = loc.id === selectedLocId ? 'active' : ''
+
             return `
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
@@ -49,6 +52,7 @@ function renderLocs(locs) {
                 Created: ${utilService.elapsedTime(loc.createdAt)}
                 ${loc.createdAt !== loc.updatedAt ? ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}` : ''}
             </p>
+
             <div class="loc-btns">     
                <button title="Delete" onclick="app.onRemoveLoc('${loc.id}')">🗑️</button>
                <button title="Edit" onclick="app.onUpdateLoc('${loc.id}')">✏️</button>
@@ -137,6 +141,7 @@ function onPanToUserPos() {
     mapService
         .getUserPosition()
         .then(latLng => {
+            gUserPos = latLng
             mapService.panTo({ ...latLng, zoom: 15 })
             unDisplayLoc()
             loadAndRenderLocs()
@@ -181,13 +186,21 @@ function displayLoc(loc) {
     document.querySelector('.loc.active')?.classList?.remove('active')
     document.querySelector(`.loc[data-id="${loc.id}"]`).classList.add('active')
 
+    var distanceStr = ''
+
+    if (gUserPos) {
+        const distance = utilService.getDistance(gUserPos, loc.geo)
+        distanceStr = `Distance: ${distance} KM`
+        console.log('distanceStr:', distanceStr)
+    }
+
     mapService.panTo(loc.geo)
     mapService.setMarker(loc)
-
     const el = document.querySelector('.selected-loc')
     el.querySelector('.loc-name').innerText = loc.name
     el.querySelector('.loc-address').innerText = loc.geo.address
     el.querySelector('.loc-rate').innerHTML = '★'.repeat(loc.rate)
+    el.querySelector('.distance').innerText = distanceStr
     el.querySelector('[name=loc-copier]').value = window.location
     el.classList.add('show')
 
