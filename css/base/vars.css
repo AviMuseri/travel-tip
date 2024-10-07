@@ -1,9 +1,9 @@
 :root {
-    --bg1: darkslateblue;
-    --bg2: darkorchid;
-    --bg3: darkmagenta;
+    --bg1: #00CCDD;
+    --bg2: #4F75FF;
+    --bg3: #6439FF;
     --color1: aliceblue;
-    --color2: deeppink;
+    --color2: #4F75FF;
     --color3: gold;
     --color4: goldenrod;
     --gray1: lightgray;
