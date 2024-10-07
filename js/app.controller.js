@@ -273,6 +273,11 @@ function renderLocStats() {
         console.log('stats:', stats)
         handleStats(stats, 'loc-stats-rate')
     })
+
+    locService.getLocCountByDateMap().then(stats => {
+        console.log('stats:', stats)
+        handleStats(stats, 'loc-stats-date')
+    })
 }
 
 function handleStats(stats, selector) {
@@ -318,6 +323,7 @@ function handleStats(stats, selector) {
 }
 
 function cleanStats(stats) {
+
     const cleanedStats = Object.keys(stats).reduce((acc, label) => {
         if (label !== 'total' && stats[label]) {
             acc.push(label)

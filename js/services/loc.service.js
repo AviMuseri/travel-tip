@@ -14,7 +14,7 @@ import { storageService } from './async-storage.service.js'
 //     createdAt: 1706562160181,
 //     updatedAt: 1706562160181
 // }
-
+const DAY_MS = 86_400_000
 const PAGE_SIZE = 5
 const DB_KEY = 'locs'
 var gSortBy = { rate: -1 }
@@ -30,7 +30,8 @@ export const locService = {
     save,
     setFilterBy,
     setSortBy,
-    getLocCountByRateMap
+    getLocCountByRateMap,
+    getLocCountByDateMap
 }
 
 function query() {
@@ -101,6 +102,21 @@ function getLocCountByRateMap() {
             return locCountByRateMap
         })
 }
+
+function getLocCountByDateMap() {
+    return storageService.query(DB_KEY)
+        .then(locs => {
+            const locCountByDateMap = locs.reduce((map, loc) => {
+                if (loc.updatedAt === loc.createdAt) map.never++
+                else if (Date.now() - loc.updatedAt < DAY_MS) map.today++
+                else map.past++
+                return map
+            }, { today: 0, past: 0, never: 0 })
+            locCountByDateMap.total = locs.length
+            return locCountByDateMap
+        })
+}
+
 
 function setSortBy(sortBy = {}) {
     gSortBy = sortBy
