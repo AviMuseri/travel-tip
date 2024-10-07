@@ -18,7 +18,7 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
-    onSaveLoc
+    onSaveLoc,
 }
 
 function onInit() {
@@ -116,24 +116,24 @@ function onAddLoc(geo) {
     elNameInput.value = geo.address || 'Just a place'
     elRateInput.value = 0
 
-    // if (!elNameInput.value) return
+    if (!elNameInput.value) return
 
-    // const loc = {
-    //     name: elNameInput.value,
-    //     rate: elRateInput.value,
-    //     geo,
-    // }
-    // locService
-    //     .save(loc)
-    //     .then(savedLoc => {
-    //         flashMsg(`Added Location (id: ${savedLoc.id})`)
-    //         utilService.updateQueryParams({ locId: savedLoc.id })
-    //         loadAndRenderLocs()
-    //     })
-    //     .catch(err => {
-    //         console.error('OOPs:', err)
-    //         flashMsg('Cannot add location')
-    //     })
+    const loc = {
+        name: elNameInput.value,
+        rate: elRateInput.value,
+        geo,
+    }
+    locService
+        .save(loc)
+        .then(savedLoc => {
+            flashMsg(`Added Location (id: ${savedLoc.id})`)
+            utilService.updateQueryParams({ locId: savedLoc.id })
+            loadAndRenderLocs()
+        })
+        .catch(err => {
+            console.error('OOPs:', err)
+            flashMsg('Cannot add location')
+        })
 }
 
 function loadAndRenderLocs() {
@@ -163,7 +163,6 @@ function onPanToUserPos() {
 }
 
 function onUpdateLoc(locId) {
-
     locService.getById(locId).then(loc => {
         const elNameInput = document.getElementById('locName')
         const elRateInput = document.getElementById('locRate')
@@ -181,8 +180,6 @@ function onUpdateLoc(locId) {
             })
     })
 }
-
-
 
 function updateLoc(locId) {
     locService.getById(locId).then(loc => {
@@ -370,7 +367,6 @@ function handleStats(stats, selector) {
 }
 
 function cleanStats(stats) {
-
     const cleanedStats = Object.keys(stats).reduce((acc, label) => {
         if (label !== 'total' && stats[label]) {
             acc.push(label)
@@ -398,5 +394,4 @@ function onSaveLoc(ev) {
 
     const selectedLocId = getLocIdFromQueryParams()
     updateLoc(selectedLocId)
-
 }
