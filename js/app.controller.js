@@ -42,10 +42,12 @@ function renderLocs(locs) {
         .map(loc => {
             const className = loc.id === selectedLocId ? 'active' : ''
 
+            const distanceStr = getDistanceStr(loc)
             return `
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
+                <span>${distanceStr}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
             <p class="muted">
@@ -186,13 +188,7 @@ function displayLoc(loc) {
     document.querySelector('.loc.active')?.classList?.remove('active')
     document.querySelector(`.loc[data-id="${loc.id}"]`).classList.add('active')
 
-    var distanceStr = ''
-
-    if (gUserPos) {
-        const distance = utilService.getDistance(gUserPos, loc.geo)
-        distanceStr = `Distance: ${distance} KM`
-        console.log('distanceStr:', distanceStr)
-    }
+    var distanceStr = getDistanceStr(loc)
 
     mapService.panTo(loc.geo)
     mapService.setMarker(loc)
@@ -329,4 +325,15 @@ function cleanStats(stats) {
         return acc
     }, [])
     return cleanedStats
+}
+
+function getDistanceStr(loc) {
+    var distanceStr = ''
+
+    if (gUserPos) {
+        const distance = utilService.getDistance(gUserPos, loc.geo)
+        distanceStr = `Distance: ${distance} KM`
+    }
+
+    return distanceStr
 }
