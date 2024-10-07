@@ -4,7 +4,7 @@ import { mapService } from './services/map.service.js'
 
 window.onload = onInit
 
-// To make things easier in this project structure 
+// To make things easier in this project structure
 // functions that are called from DOM are defined on a global app object
 window.app = {
     onRemoveLoc,
@@ -21,7 +21,8 @@ window.app = {
 function onInit() {
     loadAndRenderLocs()
 
-    mapService.initMap()
+    mapService
+        .initMap()
         .then(() => {
             // onPanToTokyo()
             mapService.addClickListener(onAddLoc)
@@ -35,9 +36,10 @@ function onInit() {
 function renderLocs(locs) {
     const selectedLocId = getLocIdFromQueryParams()
     // console.log('locs:', locs)
-    var strHTML = locs.map(loc => {
-        const className = (loc.id === selectedLocId) ? 'active' : ''
-        return `
+    var strHTML = locs
+        .map(loc => {
+            const className = loc.id === selectedLocId ? 'active' : ''
+            return `
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
@@ -45,16 +47,16 @@ function renderLocs(locs) {
             </h4>
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
-                ${(loc.createdAt !== loc.updatedAt) ?
-                ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}`
-                : ''}
+                ${loc.createdAt !== loc.updatedAt ? ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}` : ''}
             </p>
             <div class="loc-btns">     
                <button title="Delete" onclick="app.onRemoveLoc('${loc.id}')">🗑️</button>
                <button title="Edit" onclick="app.onUpdateLoc('${loc.id}')">✏️</button>
                <button title="Select" onclick="app.onSelectLoc('${loc.id}')">🗺️</button>
             </div>     
-        </li>`}).join('')
+        </li>`
+        })
+        .join('')
 
     const elLocList = document.querySelector('.loc-list')
     elLocList.innerHTML = strHTML || 'No locs to show'
@@ -69,7 +71,11 @@ function renderLocs(locs) {
 }
 
 function onRemoveLoc(locId) {
-    locService.remove(locId)
+    const isDelete = confirm('Are you sure you want to remove this location?')
+    if (!isDelete) return
+
+    locService
+        .remove(locId)
         .then(() => {
             flashMsg('Location removed')
             unDisplayLoc()
@@ -84,7 +90,8 @@ function onRemoveLoc(locId) {
 function onSearchAddress(ev) {
     ev.preventDefault()
     const el = document.querySelector('[name=address]')
-    mapService.lookupAddressGeo(el.value)
+    mapService
+        .lookupAddressGeo(el.value)
         .then(geo => {
             mapService.panTo(geo)
         })
@@ -101,10 +108,11 @@ function onAddLoc(geo) {
     const loc = {
         name: locName,
         rate: +prompt(`Rate (1-5)`, '3'),
-        geo
+        geo,
     }
-    locService.save(loc)
-        .then((savedLoc) => {
+    locService
+        .save(loc)
+        .then(savedLoc => {
             flashMsg(`Added Location (id: ${savedLoc.id})`)
             utilService.updateQueryParams({ locId: savedLoc.id })
             loadAndRenderLocs()
@@ -116,7 +124,8 @@ function onAddLoc(geo) {
 }
 
 function loadAndRenderLocs() {
-    locService.query()
+    locService
+        .query()
         .then(renderLocs)
         .catch(err => {
             console.error('OOPs:', err)
@@ -125,7 +134,8 @@ function loadAndRenderLocs() {
 }
 
 function onPanToUserPos() {
-    mapService.getUserPosition()
+    mapService
+        .getUserPosition()
         .then(latLng => {
             mapService.panTo({ ...latLng, zoom: 15 })
             unDisplayLoc()
@@ -139,27 +149,27 @@ function onPanToUserPos() {
 }
 
 function onUpdateLoc(locId) {
-    locService.getById(locId)
-        .then(loc => {
-            const rate = prompt('New rate?', loc.rate)
-            if (rate !== loc.rate) {
-                loc.rate = rate
-                locService.save(loc)
-                    .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
-                        loadAndRenderLocs()
-                    })
-                    .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
-
-            }
-        })
+    locService.getById(locId).then(loc => {
+        const rate = prompt('New rate?', loc.rate)
+        if (rate !== loc.rate) {
+            loc.rate = rate
+            locService
+                .save(loc)
+                .then(savedLoc => {
+                    flashMsg(`Rate was set to: ${savedLoc.rate}`)
+                    loadAndRenderLocs()
+                })
+                .catch(err => {
+                    console.error('OOPs:', err)
+                    flashMsg('Cannot update location')
+                })
+        }
+    })
 }
 
 function onSelectLoc(locId) {
-    return locService.getById(locId)
+    return locService
+        .getById(locId)
         .then(displayLoc)
         .catch(err => {
             console.error('OOPs:', err)
@@ -205,7 +215,7 @@ function onShareLoc() {
     const data = {
         title: 'Cool location',
         text: 'Check out this location',
-        url
+        url,
     }
     navigator.share(data)
 }
@@ -232,7 +242,7 @@ function onSetSortBy() {
     if (!prop) return
 
     const sortBy = {}
-    sortBy[prop] = (isDesc) ? -1 : 1
+    sortBy[prop] = isDesc ? -1 : 1
 
     // Shorter Syntax:
     // const sortBy = {
@@ -283,14 +293,16 @@ function handleStats(stats, selector) {
     const style = `background-image: conic-gradient(${colorsStr})`
     elPie.style = style
 
-    const ledendHTML = labels.map((label, idx) => {
-        return `
+    const ledendHTML = labels
+        .map((label, idx) => {
+            return `
                 <li>
                     <span class="pie-label" style="background-color:${colors[idx]}"></span>
                     ${label} (${stats[label]})
                 </li>
             `
-    }).join('')
+        })
+        .join('')
 
     const elLegend = document.querySelector(`.${selector} .legend`)
     elLegend.innerHTML = ledendHTML
