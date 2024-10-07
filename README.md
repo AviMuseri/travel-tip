@@ -24,6 +24,7 @@ TravelTip is an app that keeps a list of favorite locations
 - Reflected in query params 
 - Copy url to clipboard
 - Share via Web-Share API
+- Edit and Create location By Modal 
 
 ## Location
 Here is the format of the location object:
@@ -51,7 +52,8 @@ export const locService = {
     save,
     setFilterBy,
     setSortBy,
-    getLocCountByRateMap
+    getLocCountByRateMap,
+    getLocCountByDateMap
 }
 
 export const mapService = {
@@ -78,7 +80,8 @@ window.app = {
     onCopyLoc,
     onShareLoc,
     onSetSortBy,
-    onSetFilterBy
+    onSetFilterBy,
+    onSaveLoc
 }
 ```
 
