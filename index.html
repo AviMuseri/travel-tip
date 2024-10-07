@@ -73,6 +73,15 @@
             </section>
         </div>
     </main>
+    <dialog class="modal">
+        <form onsubmit="app.onSaveLoc(event)" method="dialog">
+            <label for="locName"></label>
+            <input type="text" name="locName" id="locName" />
+            <label for="locRate"></label>
+            <input type="text" name="locRate" id="locRate" />
+            <button>Save</button>
+        </form>
+    </dialog>
     <pre class="debug" hidden></pre>
     <div class="user-msg"></div>
     <script type="module" src="js/app.controller.js"></script>
